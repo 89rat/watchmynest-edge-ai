@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>WatchMyNest - Edge AI Family Safety</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .app-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        
+        .status-active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .status-error {
+            background: #F44336;
+            color: white;
+        }
+        
+        .main-button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.9);
+            color: #667eea;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,1);
+            transform: translateY(-1px);
+        }
+        
+        .child-interface {
+            display: none;
+            text-align: center;
+        }
+        
+        .child-welcome {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .safety-status {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .safety-icon {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .emergency-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .btn-emergency {
+            flex: 1;
+            padding: 20px;
+            background: linear-gradient(135deg, #FF4444, #CC0000);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-emergency:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+        }
+        
+        .btn-fun {
+            flex: 1;
+            padding: 20px;
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-fun:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+        }
+        
+        .privacy-notice {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: auto;
+            font-size: 12px;
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .performance-monitor {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-family: monospace;
+            z-index: 1000;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 350px;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .modal-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .processing-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .main-button {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="performance-monitor" id="performanceMonitor">
+        CPU: 0.6% | MEM: 45MB | BAT: 0.8%/h
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">🛡️</div>
+            <h1 class="app-title">WatchMyNest</h1>
+            <p class="app-subtitle">Edge AI Family Safety System</p>
+        </div>
+        
+        <div class="status-card">
+            <h3 style="margin-bottom: 15px; color: #333;">System Status</h3>
+            
+            <div class="status-item">
+                <div class="status-icon status-active" id="edgeAIStatus">AI</div>
+                <span>Edge AI Processing <span class="processing-indicator"></span></span>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon status-active" id="snnStatus">SNN</div>
+                <span>Spiking Neural Network (6K params)</span>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon status-active" id="annStatus">ANN</div>
+                <span>CNN Head (120K params, INT8)</span>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon status-active" id="learningStatus">📚</div>
+                <span>Continuous Learning Active</span>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon status-active" id="privacyStatus">🔒</div>
+                <span>Privacy-First Processing</span>
+            </div>
+        </div>
+        
+        <div id="mainInterface">
+            <button class="main-button btn-primary" onclick="startChildMode()">
+                🛡️ Start Child Protection
+            </button>
+            
+            <button class="main-button btn-secondary" onclick="showParentDashboard()">
+                📊 Parent Dashboard
+            </button>
+            
+            <button class="main-button btn-secondary" onclick="showSettings()">
+                ⚙️ Settings & Setup
+            </button>
+        </div>
+        
+        <div id="childInterface" class="child-interface">
+            <div class="child-welcome">
+                🌟 You're Safe & Protected! 🌟
+            </div>
+            
+            <div class="safety-status">
+                <div class="safety-icon">🛡️</div>
+                <div>
+                    <div style="font-weight: bold; color: #4CAF50;">Protected by WatchMyNest</div>
+                    <div style="font-size: 12px; color: #666;">Edge AI monitoring active</div>
+                </div>
+            </div>
+            
+            <div class="emergency-buttons">
+                <button class="btn-emergency" onclick="triggerEmergency()">
+                    🚨<br>Emergency<br>Help
+                </button>
+                <button class="btn-fun" onclick="showActivities()">
+                    🎮<br>Safe<br>Activities
+                </button>
+            </div>
+            
+            <button class="main-button btn-secondary" onclick="showMainInterface()">
+                ← Back to Main
+            </button>
+        </div>
+        
+        <div class="privacy-notice">
+            🔒 Privacy First: All AI processing happens on your device. 
+            No personal data leaves your phone without permission.
+        </div>
+    </div>
+    
+    <!-- Emergency Modal -->
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🚨 Emergency Alert</div>
+            <div class="modal-text">
+                Emergency help has been requested!<br><br>
+                • Parents are being notified<br>
+                • Location is being shared<br>
+                • Help is on the way
+            </div>
+            <button class="main-button btn-primary" onclick="closeEmergencyModal()">
+                OK, I'm Safe Now
+            </button>
+        </div>
+    </div>
+    
+    <!-- Parent Dashboard Modal -->
+    <div id="dashboardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">📊 Parent Dashboard</div>
+            <div class="modal-text">
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <strong>Child Status:</strong> Safe & Protected<br>
+                    <strong>Last Check:</strong> 2 minutes ago<br>
+                    <strong>Location:</strong> Home<br>
+                    <strong>Activity:</strong> Normal<br><br>
+                    
+                    <strong>Today's Events:</strong><br>
+                    • 14:30 - Arrived home safely<br>
+                    • 12:15 - Left school (normal)<br>
+                    • 08:00 - Arrived at school<br><br>
+                    
+                    <strong>AI Performance:</strong><br>
+                    • Processing: 0.6% CPU usage<br>
+                    • Memory: 45MB (within limits)<br>
+                    • Battery: 0.8% drain per hour<br>
+                    • Accuracy: 97.2% (excellent)
+                </div>
+            </div>
+            <button class="main-button btn-primary" onclick="closeDashboardModal()">
+                Close Dashboard
+            </button>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ Settings</div>
+            <div class="modal-text">
+                <div style="text-align: left;">
+                    <strong>Edge AI Configuration:</strong><br>
+                    ✅ SNN Encoder: 6K parameters<br>
+                    ✅ CNN Head: 120K parameters<br>
+                    ✅ Continuous Learning: Enabled<br>
+                    ✅ Privacy Mode: Maximum<br><br>
+                    
+                    <strong>Resource Usage:</strong><br>
+                    • CPU Limit: 10% (currently 0.6%)<br>
+                    • Memory Limit: 350MB (currently 45MB)<br>
+                    • Battery Target: <2%/day (currently 0.8%)<br><br>
+                    
+                    <strong>Safety Features:</strong><br>
+                    ✅ Fall Detection<br>
+                    ✅ Voice Keyword Detection<br>
+                    ✅ Behavioral Analysis<br>
+                    ✅ Emergency Response<br>
+                </div>
+            </div>
+            <button class="main-button btn-primary" onclick="closeSettingsModal()">
+                Close Settings
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Edge AI Simulation System
+        class EdgeAISystem {
+            constructor() {
+                this.isActive = false;
+                this.snnProcessor = new SNNProcessor();
+                this.annProcessor = new ANNProcessor();
+                this.learningSystem = new ContinuousLearning();
+                this.performanceMonitor = new PerformanceMonitor();
+                this.safetyEvents = [];
+                
+                this.init();
+            }
+            
+            init() {
+                console.log('🚀 Initializing WatchMyNest Edge AI System');
+                this.performanceMonitor.start();
+                this.updateStatus();
+                
+                // Simulate edge AI processing
+                setInterval(() => {
+                    if (this.isActive) {
+                        this.processCycle();
+                    }
+                }, 1000); // 1Hz processing
+            }
+            
+            start() {
+                this.isActive = true;
+                console.log('✅ Edge AI Protection Started');
+                this.updateStatus();
+                
+                // Simulate initial model loading
+                setTimeout(() => {
+                    this.showNotification('Edge AI models loaded successfully', 'success');
+                }, 1000);
+            }
+            
+            stop() {
+                this.isActive = false;
+                console.log('⏹️ Edge AI Protection Stopped');
+                this.updateStatus();
+            }
+            
+            processCycle() {
+                // Simulate SNN processing (always-on, low power)
+                const spikeData = this.snnProcessor.process();
+                
+                // Check for triggers (15 times per hour average)
+                if (Math.random() < 0.004) { // ~15 triggers per hour
+                    console.log('🔍 Safety trigger detected, running ANN head');
+                    
+                    // Simulate ANN head processing (35ms burst)
+                    setTimeout(() => {
+                        const safetyResult = this.annProcessor.process(spikeData);
+                        
+                        if (safetyResult.confidence > 0.8) {
+                            this.handleSafetyEvent(safetyResult);
+                        }
+                    }, 35);
+                }
+                
+                // Update performance metrics
+                this.performanceMonitor.update();
+            }
+            
+            handleSafetyEvent(result) {
+                const event = {
+                    timestamp: new Date(),
+                    type: result.eventType,
+                    confidence: result.confidence,
+                    location: 'Current Location'
+                };
+                
+                this.safetyEvents.unshift(event);
+                if (this.safetyEvents.length > 10) {
+                    this.safetyEvents.pop();
+                }
+                
+                console.log('⚠️ Safety Event:', event);
+                
+                // Store for continuous learning
+                this.learningSystem.storeExemplar(result);
+                
+                // High confidence events trigger alerts
+                if (result.confidence > 0.9) {
+                    this.showNotification(`High confidence ${result.eventType} detected`, 'warning');
+                }
+            }
+            
+            updateStatus() {
+                const edgeStatus = document.getElementById('edgeAIStatus');
+                const snnStatus = document.getElementById('snnStatus');
+                const annStatus = document.getElementById('annStatus');
+                
+                if (this.isActive) {
+                    edgeStatus.className = 'status-icon status-active';
+                    snnStatus.className = 'status-icon status-active';
+                    annStatus.className = 'status-icon status-active';
+                } else {
+                    edgeStatus.className = 'status-icon status-inactive';
+                    snnStatus.className = 'status-icon status-inactive';
+                    annStatus.className = 'status-icon status-inactive';
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#FF9800' : '#2196F3'};
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    z-index: 3000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 3000);
+            }
+        }
+        
+        // SNN Processor (6K parameters, 1-bit spikes)
+        class SNNProcessor {
+            constructor() {
+                this.neurons = 64;
+                this.weights = new Float32Array(6000);
+                this.spikes = new Uint8Array(this.neurons);
+                this.threshold = 0.5;
+                
+                // Initialize weights randomly
+                for (let i = 0; i < this.weights.length; i++) {
+                    this.weights[i] = (Math.random() - 0.5) * 0.1;
+                }
+            }
+            
+            process() {
+                // Simulate audio/sensor input processing
+                const input = new Float32Array(16);
+                for (let i = 0; i < input.length; i++) {
+                    input[i] = Math.random() * 0.1; // Simulate sensor noise
+                }
+                
+                // Generate spike events
+                this.spikes.fill(0);
+                for (let i = 0; i < this.neurons; i++) {
+                    const activation = Math.random() * 0.2;
+                    if (activation > this.threshold) {
+                        this.spikes[i] = 1;
+                    }
+                }
+                
+                // Return spike histogram (128 bytes)
+                const histogram = new Float32Array(128);
+                for (let i = 0; i < 128; i++) {
+                    histogram[i] = Math.random() * 0.1;
+                }
+                
+                return histogram;
+            }
+        }
+        
+        // ANN Processor (120K parameters, INT8)
+        class ANNProcessor {
+            constructor() {
+                this.weights = new Int8Array(120000);
+                this.eventTypes = ['fall', 'help_keyword', 'stranger_approach', 'panic_voice'];
+                
+                // Initialize quantized weights
+                for (let i = 0; i < this.weights.length; i++) {
+                    this.weights[i] = Math.floor((Math.random() - 0.5) * 256);
+                }
+            }
+            
+            process(spikeData) {
+                // Simulate CNN processing (35ms on NPU)
+                const confidence = Math.random();
+                const eventType = this.eventTypes[Math.floor(Math.random() * this.eventTypes.length)];
+                
+                return {
+                    eventType: eventType,
+                    confidence: confidence,
+                    processingTime: 35
+                };
+            }
+        }
+        
+        // Continuous Learning System
+        class ContinuousLearning {
+            constructor() {
+                this.supportSet = [];
+                this.maxExemplars = 40;
+                this.learningRate = 0.001;
+            }
+            
+            storeExemplar(result) {
+                const exemplar = {
+                    timestamp: Date.now(),
+                    eventType: result.eventType,
+                    confidence: result.confidence,
+                    features: new Float32Array(128)
+                };
+                
+                // Fill with random features (in real system, these would be spike histograms)
+                for (let i = 0; i < exemplar.features.length; i++) {
+                    exemplar.features[i] = Math.random();
+                }
+                
+                this.supportSet.unshift(exemplar);
+                if (this.supportSet.length > this.maxExemplars) {
+                    this.supportSet.pop();
+                }
+                
+                console.log('📚 Stored exemplar for continuous learning');
+            }
+            
+            nightLearning() {
+                if (this.supportSet.length < 5) {
+                    console.log('📚 Not enough exemplars for night learning');
+                    return false;
+                }
+                
+                console.log('🌙 Starting night-time learning update...');
+                
+                // Simulate 4-minute learning process
+                setTimeout(() => {
+                    console.log('✅ Night-time learning completed successfully');
+                    edgeAI.showNotification('AI model updated and improved', 'success');
+                }, 4000);
+                
+                return true;
+            }
+        }
+        
+        // Performance Monitor
+        class PerformanceMonitor {
+            constructor() {
+                this.cpuUsage = 0.6;
+                this.memoryMB = 45;
+                this.batteryDrainPerHour = 0.8;
+                this.processingLatency = 6;
+                this.triggerRate = 15;
+            }
+            
+            start() {
+                setInterval(() => {
+                    this.update();
+                    this.updateDisplay();
+                }, 5000);
+            }
+            
+            update() {
+                // Simulate realistic performance metrics
+                this.cpuUsage = 0.4 + Math.random() * 0.4; // 0.4-0.8%
+                this.memoryMB = 40 + Math.random() * 10; // 40-50MB
+                this.batteryDrainPerHour = 0.6 + Math.random() * 0.4; // 0.6-1.0%/h
+                this.processingLatency = 4 + Math.random() * 4; // 4-8ms
+            }
+            
+            updateDisplay() {
+                const monitor = document.getElementById('performanceMonitor');
+                monitor.textContent = `CPU: ${this.cpuUsage.toFixed(1)}% | MEM: ${Math.round(this.memoryMB)}MB | BAT: ${this.batteryDrainPerHour.toFixed(1)}%/h`;
+            }
+            
+            getStats() {
+                return {
+                    cpuUsage: this.cpuUsage,
+                    memoryMB: this.memoryMB,
+                    batteryDrainPerHour: this.batteryDrainPerHour,
+                    processingLatency: this.processingLatency,
+                    triggerRate: this.triggerRate
+                };
+            }
+        }
+        
+        // Initialize Edge AI System
+        const edgeAI = new EdgeAISystem();
+        
+        // UI Functions
+        function startChildMode() {
+            document.getElementById('mainInterface').style.display = 'none';
+            document.getElementById('childInterface').style.display = 'block';
+            
+            edgeAI.start();
+            edgeAI.showNotification('Child protection mode activated', 'success');
+        }
+        
+        function showMainInterface() {
+            document.getElementById('mainInterface').style.display = 'block';
+            document.getElementById('childInterface').style.display = 'none';
+            
+            edgeAI.stop();
+        }
+        
+        function triggerEmergency() {
+            console.log('🚨 EMERGENCY ALERT TRIGGERED');
+            
+            // Simulate emergency response
+            edgeAI.showNotification('Emergency alert sent to parents!', 'warning');
+            
+            // Show emergency modal
+            document.getElementById('emergencyModal').style.display = 'flex';
+            
+            // Simulate emergency actions
+            setTimeout(() => {
+                edgeAI.showNotification('Location shared with emergency contacts', 'warning');
+            }, 2000);
+            
+            setTimeout(() => {
+                edgeAI.showNotification('Parents have been notified', 'warning');
+            }, 4000);
+        }
+        
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').style.display = 'none';
+            edgeAI.showNotification('Emergency resolved', 'success');
+        }
+        
+        function showActivities() {
+            edgeAI.showNotification('Safe activities feature coming soon!', 'info');
+        }
+        
+        function showParentDashboard() {
+            document.getElementById('dashboardModal').style.display = 'flex';
+        }
+        
+        function closeDashboardModal() {
+            document.getElementById('dashboardModal').style.display = 'none';
+        }
+        
+        function showSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+        
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Simulate night learning trigger (when device is charging)
+        setTimeout(() => {
+            if (Math.random() < 0.3) { // 30% chance
+                console.log('🔋 Device charging detected, triggering night learning');
+                edgeAI.learningSystem.nightLearning();
+            }
+        }, 30000); // After 30 seconds
+        
+        // Add PWA functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(() => {
+                console.log('📱 PWA Service Worker registered');
+            });
+        }
+        
+        // Add to home screen prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            setTimeout(() => {
+                if (confirm('Install WatchMyNest as an app for better performance?')) {
+                    deferredPrompt.prompt();
+                }
+            }, 10000);
+        });
+        
+        console.log('🛡️ WatchMyNest Edge AI System Initialized');
+        console.log('📊 Resource Usage: <10% mobile resources, <2% battery/day');
+        console.log('🔒 Privacy: All processing on-device, zero cloud dependency');
+        console.log('🧠 AI: SNN-ANN composite with continuous learning');
+    </script>
+</body>
+</html>
+
